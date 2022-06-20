@@ -154,6 +154,7 @@ bool getTemperature() {
 
 void setup()
 {
+  pinMode(16, OUTPUT);
   Serial.begin(115200);
   Serial.println();
   Serial.println("DHT ESP32 example with tasks");
@@ -163,6 +164,10 @@ void setup()
 }
 
 void loop() {
+  digitalWrite(16, HIGH);   // turn the LED on (HIGH is the voltage level)
+  delay(1000);                       // wait for a second
+  digitalWrite(16, LOW);    // turn the LED off by making the voltage LOW
+  delay(1000);                       // wait for a second
   if (!tasksEnabled) {
     // Wait 2 seconds to let system settle down
     delay(2000);
