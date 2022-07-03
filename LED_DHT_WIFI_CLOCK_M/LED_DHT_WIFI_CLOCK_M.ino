@@ -33,7 +33,7 @@
 
 
 #define DHTTYPE DHT11   // Select at the Library DHT 11
-#define SensorPin 4  // ESP32 pin analog feacture
+#define SensorPin 34  // ESP32 pin analog feacture
 // Library to contro the DS1302
 #include <ThreeWire.h>
 #include <RtcDS1302.h>
@@ -144,13 +144,14 @@ void loop() {
   float t = dht.readTemperature();
   // Read temperature as Fahrenheit (isFahrenheit = true)
   float f = dht.readTemperature(true);
+  float sensorValue = analogRead(SensorPin);
+  int output_sensor = sensorValue;
   
-  float m = analogRead(SensorPin);
-
+ 
   if(WiFi.status()== WL_CONNECTED){
     WiFiClient client;
     HTTPClient http;
-    // Your Domain name with URL path or IP address with path
+    //Domain name with URL path or IP address with path it was defined
     http.begin(client, serverName);
     // Specify content-type header
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -163,6 +164,7 @@ void loop() {
 
     // Send HTTP POST request
     int httpResponseCode = http.POST(httpRequestData);
+    
 
    if (httpResponseCode>0) {
       Serial.print("HTTP Response code: ");
@@ -183,9 +185,9 @@ void loop() {
 
       
     // Wait a few seconds between measurements.
-    digitalWrite(LED_STA, HIGH);   // turn the LED on (HIGH is the voltage level)
+    digitalWrite(LED_STA_WIFI, HIGH);   // turn the LED on (HIGH is the voltage level)
     delay(1000);                       // wait for a second
-    digitalWrite(LED_STA, LOW);    // turn the LED off by making the voltage LOW
+    digitalWrite(LED_STA_WIFI, LOW);    // turn the LED off by making the voltage LOW
     delay(1000);                       // wait for a second
   
     // Reading temperature or humidity takes about 250 milliseconds!
@@ -213,14 +215,17 @@ void loop() {
     Serial.print(t);
     Serial.print(F("°C "));
     Serial.print(f);
-    Serial.print(F("°F  Heat index: "));
-    Serial.print(hic);
-    Serial.print(F("°C "));
-    Serial.print(hif);
-    Serial.print(F("°F"));
-    Serial.print("Moisture: ");
+    Serial.print(F("°F" ))
+    Serial.print(F("Moisture: "));
     Serial.print(m);
     Serial.println("%");
+    // Heat index: "));
+    //Serial.print(hic);
+    //Serial.print(F("°C "));
+    //Serial.print(hif);
+    //Serial.println(F("°F"));
+
+    delay(1000);
     
 
 

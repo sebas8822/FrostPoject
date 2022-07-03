@@ -1,57 +1,31 @@
-// Testing sketch for various DHT humidity/temperature sensors/clock1302
+// Example testing sketch for various DHT humidity/temperature sensors
 // Written by ladyada, public domain
 
 // REQUIRES the following Arduino libraries:
 // - DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
 // - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
 
-
-//ESP32-38pins
-
-//CONNECTIONS Clock:
-//DS1302 CLK/SCLK -->G13
-//DS1302 DATA/IO -->G12 
-//DS1302 RST/CE -->G14 
-//DS1302 VCC --> 3.3V -5V
-//DS1302 GND --> GND
-
-//CONNECTIONS DHT Left to right:
-//DHT Pin 1 --> G17
-//DHT Pin 2 --> +5V
-//DHT Pin 3 --> GND
-
-//CONNECtiON LED Status
-//WIFI Led status -->G16
-
-
-
 #include "DHT.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
 #define DHTPIN 17     // Digital pin connected to the DHT sensor
+// Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
+// Pin 15 can work but DHT must be disconnected during program upload.
+// Uncomment whatever type you're using!
+#define DHTTYPE DHT11   // DHT 11
+//#define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
+//#define DHTTYPE DHT21   // DHT 21 (AM2301)
 
 
-
-#define DHTTYPE DHT11   // Select at the Library DHT 11
-#define SensorPin 4  // ESP32 pin analog feacture
-// Library to contro the DS1302
-#include <ThreeWire.h>
-#include <RtcDS1302.h>
-
-ThreeWire myWire(12,13,14);
-RtcDS1302<ThreeWire> Rtc(myWire);
-
-
-//Credentials to conect to the local wifi
 const char* ssid = "BelongDC7164";
 const char* password = "kymkdr3pqekj";
 
-//Domain name with URL path and IP address with path to send the data
+//Your Domain name with URL path or IP address with path
 const char* serverName = "http://10.0.0.8/testproject/esp-post-data.php";
 
-//Security feacture API Key value to be compatible with the PHP code have to match both (post data).
+// Keep this API Key value to be compatible with the PHP code provided in the project page.
+// If you change the apiKeyValue value, the PHP file /esp-post-data.php also needs to have the same key
 String apiKeyValue = "tPmAT5Ab3j7F9";
-//Device identification can be change to improve identification in the network
 String sensorName = "DHT11";
 String sensorLocation = "Office";
 unsigned long lastTime = 0;
@@ -59,72 +33,30 @@ unsigned long lastTime = 0;
 //unsigned long timerDelay = 600000;
 // Set timer to 30 seconds (30000)
 unsigned long timerDelay = 30000;
-//int Moisture;
-#define LED_STA 16 
+
+
+
+// Connect pin 1 (on the left) of the sensor to +5V
+// NOTE: If using a board with 3.3V logic like an Arduino Due connect pin 1
+// to 3.3V instead of 5V!
+// Connect pin 2 of the sensor to whatever your DHTPIN is
+// Connect pin 3 (on the right) of the sensor to GROUND (if your sensor has 3 pins)
+// Connect pin 4 (on the right) of the sensor to GROUND and leave the pin 3 EMPTY (if your sensor has 4 pins)
+// Connect a 10K resistor from pin 2 (data) to pin 1 (power) of the sensor
+
 // Initialize DHT sensor.
+// Note that older versions of this library took an optional third parameter to
+// tweak the timings for faster processors.  This parameter is no longer needed
+// as the current DHT reading algorithm adjusts itself to work on faster procs.
+#define LED_STA 16 
 DHT dht(DHTPIN, DHTTYPE);
-
-
-
+#define SensorPin 34  // ESP32 pin analog feacture
+int output_sensor;
 void setup() {
-  
-  //WIFI Status led Pin G16
   pinMode(LED_STA, OUTPUT);
   Serial.begin(115200);
-  // Moisture sensor
+  Serial.println(F("DHTxx test!"));
   Serial.println("Reading Moisture Sensor....");
-  delay(2000);
-  //Clock
-  Serial.print("Compile:");
-  Serial.print(__DATE__);
-  Serial.print(__TIME__);
-  Rtc.Begin();
-
-  RtcDateTime compiled = RtcDateTime(__DATE__,__TIME__);
-  printDateTime(compiled);
-  Serial.println();
-
-
-  if (!Rtc.IsDateTimeValid()) 
-  {
-      // Common Causes:
-      //    1) first time you ran and the device wasn't running yet
-      //    2) the battery on the device is low or even missing
-
-      Serial.println("RTC lost confidence in the DateTime!");
-      Rtc.SetDateTime(compiled);
-  }
-
-  if (Rtc.GetIsWriteProtected())
-  {
-      Serial.println("RTC was write protected, enabling writing now");
-      Rtc.SetIsWriteProtected(false);
-  }
-
-  if (!Rtc.GetIsRunning())
-  {
-      Serial.println("RTC was not actively running, starting now");
-      Rtc.SetIsRunning(true);
-  }
-
-  RtcDateTime now = Rtc.GetDateTime();
-  if (now < compiled) 
-  {
-      Serial.println("RTC is older than compile time!  (Updating DateTime)");
-      Rtc.SetDateTime(compiled);
-  }
-  else if (now > compiled) 
-  {
-      Serial.println("RTC is newer than compile time. (this is expected)");
-  }
-  else if (now == compiled) 
-  {
-      Serial.println("RTC is the same as compile time! (not expected but all is fine)");
-  }
-
-
-  // Setup WIFI  
-  Serial.println(F("DHT11 test!"));
   WiFi.begin(ssid, password);
   Serial.println("Connecting");
   while(WiFi.status() != WL_CONNECTED) {
@@ -135,6 +67,10 @@ void setup() {
   Serial.print("Connected to WiFi network with IP Address: ");
   Serial.println(WiFi.localIP());
 
+
+
+
+  
   dht.begin();
 }
 
@@ -144,9 +80,14 @@ void loop() {
   float t = dht.readTemperature();
   // Read temperature as Fahrenheit (isFahrenheit = true)
   float f = dht.readTemperature(true);
-  
-  float m = analogRead(SensorPin);
 
+  float sensorValue = analogRead(SensorPin);
+  int output_sensor = sensorValue;
+  Serial.print("Moisture: ");
+  Serial.print(output_sensor);
+  Serial.println("%");
+  delay(1000);
+  
   if(WiFi.status()== WL_CONNECTED){
     WiFiClient client;
     HTTPClient http;
@@ -217,45 +158,5 @@ void loop() {
     Serial.print(hic);
     Serial.print(F("°C "));
     Serial.print(hif);
-    Serial.print(F("°F"));
-    Serial.print("Moisture: ");
-    Serial.print(m);
-    Serial.println("%");
-    
-
-
-    RtcDateTime now = Rtc.GetDateTime();
-
-    printDateTime(now);
-    Serial.println();
-
-    if (!now.IsValid())
-    {
-        // Common Causes:
-        //    1) the battery on the device is low or even missing and the power line was disconnected
-        Serial.println("RTC lost confidence in the DateTime!");
-    }
-
-
-    delay(8000); // 8 seconds
-
-    
-}
-
-
-#define countof(a) (sizeof(a) / sizeof(a[0]))
-void printDateTime(const RtcDateTime& dt)
-{
-    char datestring[20];
-
-    snprintf_P(datestring, 
-            countof(datestring),
-            PSTR("%02u/%02u/%04u %02u:%02u:%02u"),
-            dt.Month(),
-            dt.Day(),
-            dt.Year(),
-            dt.Hour(),
-            dt.Minute(),
-            dt.Second() );
-    Serial.print(datestring);
+    Serial.println(F("°F"));
 }

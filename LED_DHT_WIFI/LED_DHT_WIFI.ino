@@ -90,7 +90,7 @@ void loop() {
     // Prepare your HTTP POST request data
     String httpRequestData = "api_key=" + apiKeyValue + "&sensor=" + sensorName
                             + "&location=" + sensorLocation + "&value1=" + String(t)
-                            + "&value2=" + String(h) + "&value3=" + String(t) + "";
+                            + "&value2=" + String(h) + "&value3=" + String(t) + "&value4=" + String(t) + "";
     Serial.print("httpRequestData: ");
     Serial.println(httpRequestData);
 
