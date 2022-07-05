@@ -82,7 +82,7 @@ String sensorLocation = "Office";
 //unsigned long timerDelay = 600000;
 // Set timer to 30 seconds (30000)
 //unsigned long timerDelay = 30000;
-
+String dataMessage;// string with all data sensor and datatime argument as string
 
 // Initialize DHT sensor.
 DHT dht(DHTPIN, DHTTYPE);
@@ -128,7 +128,7 @@ void setup() {
   if(!file2) {
     Serial.println("File doesn't exist");
     Serial.println("Creating file...");
-    //writeFile(SD, "/backup.txt", "Epoch Time, Temperature, Humidity, Pressure \r\n");
+    writeFile(SD, "/backup.txt", "Epoch Time, Temperature, Humidity, Pressure \r\n");
   }
   else {
     Serial.println("File already exists");  
@@ -162,7 +162,7 @@ void loop() {
   float hif = dht.computeHeatIndex(f, h);
   // Compute heat index in Celsius (isFahreheit = false)
   float hic = dht.computeHeatIndex(t, h, false);
-  String dataMessage;
+  
   
   RtcDateTime now = Rtc.GetDateTime();
 
