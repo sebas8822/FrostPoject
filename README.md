@@ -35,3 +35,7 @@ The project relies on the following libraries:
 - SPI: Library for SPI communication with the MicroSD card.
 
 Make sure to install these libraries in your Arduino IDE before compiling and uploading the code to the ESP32.
+
+## Photos Project
+
+![Alt Text](https://photos.app.goo.gl/8YB2nooVJkhc3cGC7)
