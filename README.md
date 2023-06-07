@@ -38,4 +38,4 @@ Make sure to install these libraries in your Arduino IDE before compiling and up
 
 ## Photos Project
 
-![Alt Text](https://photos.google.com/share/AF1QipPtDh9xjf8nBdpjp03ZBvbppkWVwQdrz2-Zj_t08rvHLkrONA37qL0d9S1baulphA/photo/AF1QipMfZyOGHyzF0aziIHq1sFpf9TweAfF8PVYlWfGZ?key=VTRzWTJ3eHhXYklHcGJvaXZzcWd3TTRMSE1mZ3ln)
+![Alt Text](https://lh3.googleusercontent.com/pw/AJFCJaUmxmjoe7QWbMkvk0akJMMGHntlektCpGXm3OKN8O5kaeA828hRhl6412qTm37fIGo8W1n6-uIKn08YNEAWAUjDRrk7ED65rqYSMs3Vd5tNAqx6f49o_gKOCvMu2nWArsK5DPPKpJ2avu6WtfDMPd0tqw=w1506-h847-s-no?authuser=0)
